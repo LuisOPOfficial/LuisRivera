@@ -1,0 +1,245 @@
+body {
+    font-family: 'Roboto', sans-serif;
+  }
+  
+  .name-display {
+    font-size: 20px;
+    font-weight: bold;
+    color: #FFFFFF /* You can change this color to your preference */
+  }
+
+
+  
+  .modal-img {
+    max-width: 80%;
+    max-height: 80%;
+    margin: auto;
+    display: block;
+  }
+
+  .project-image {
+    max-height: 500px; /* Adjust this value to fit your desired maximum height */
+    max-width: 100%;
+    object-fit: contain;
+    margin: 0 auto;
+  }
+
+  .carousel-control-prev, .carousel-control-next {
+    background-color: rgba(0, 0, 0, 0.5); /* Add a semi-transparent black background */
+    border-radius: 50%; /* Make the background circular */
+    width: 50px; /* Adjust the width of the button */
+    height: 50px; /* Adjust the height of the button */
+  }
+  
+  .carousel-control-prev-icon, .carousel-control-next-icon {
+    background-color: transparent; /* Remove the default gray background */
+  }
+
+
+  h1 {
+
+    font-size: 20px;
+
+  }
+
+  .carousel-control-middle {
+    align-items: center;
+  }
+
+  .modal-fullscreen .modal-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .modal-fullscreen .modal-body img {
+    object-fit: contain;
+    max-width: 100%;
+    max-height: 100%;
+  }
+
+  .modal-fullscreen .modal-content {
+    background-color: rgba(73, 21, 21, 0);
+    border: none;
+    box-shadow: none;
+  }
+  
+  .modal-fullscreen .modal-dialog:before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(73, 21, 21, 0);
+    z-index: -1;
+  }
+
+  .text-designer {
+    font-weight: bold;
+  }
+  
+  .text-lightblue {
+    color: #add8e6;
+  }
+  
+  .skills-card {
+    position: relative;
+    border: 2px solid rgba(180, 19, 166, 0.1);
+    top: -30px;
+  }
+  
+  .card-logo {
+    position: absolute;
+    top: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .skills-card img {
+    width: 60px;
+    height: 60px;
+  }
+
+  .carousel-control-custom {
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+  .rounded-img {
+    border-radius: 30px;
+  }
+
+  .carousel-text {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: #fff;
+    font-size: 24px;
+    text-align: center;
+    transition: opacity 1s;
+  }
+
+  .carousel-inner {
+    perspective: 1200px;
+    height: 500px;
+    overflow: visible;
+  }
+  
+  .carousel-item {
+    opacity: 0.5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transition: all 1s;
+  }
+  
+  .carousel-item.active {
+    opacity: 1;
+    transform: translateZ(0);
+    z-index: 1;
+  }
+  
+  .carousel-item-next,
+  .carousel-item-prev {
+    opacity: 0.5;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+  
+  .carousel-item-next {
+    transform: translate3d(50%, 0, -300px);
+  }
+  
+  .carousel-item-prev {
+    transform: translate3d(-50%, 0, -300px);
+  }
+  
+  .carousel-item img {
+    max-height: 500px;
+    max-width: 500px;
+    object-fit: contain;
+  }
+  
+  .carousel-control-custom {
+    z-index: 2;
+  }
+
+  .carousel-background {
+    position: absolute;
+    top: 50px;
+    left: 0;
+    width: 100%;
+    height: 750px; /* Adjust this value to fit the height of your carousel */
+    background-image: url('https://cdn.midjourney.com/54a81801-416b-4573-82b8-804bd9ee8277/grid_0.png'); /* Replace this with the path to your background image */
+    background-size: 1290px 600px; /* Change this to 'contain' if you want the image to maintain its aspect ratio */
+    background-position: center; /* Change this to set the position of the image, e.g., 'top left', 'bottom right', etc. */
+    opacity: 1; /* Change this value between 0 and 1 to set the desired opacity */
+    z-index: -1; /* This ensures the background image stays behind the carousel */
+  }
+  .bg-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    background-image: url("https://cdn.midjourney.com/22fc0054-233c-46e6-abf0-05836b89d107/0_2.png");
+  }
+  .bg-image1 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    background-image: url("https://cdn.midjourney.com/0ff3aa5c-7213-4967-acfd-2bff57994b73/0_0.png");
+  }
+
+  .bg-image2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    background-image: url("https://cdn.midjourney.com/22fc0054-233c-46e6-abf0-05836b89d107/0_2.png");
+  }
+
+
+  .bg-image3 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    background-size: cover;
+    background-position: center;
+    opacity: 1;
+    background-image: url("https://cdn.midjourney.com/22fc0054-233c-46e6-abf0-05836b89d107/0_2.png");
+  }
+
+  .navbar {
+    padding-top: 0.15rem;
+    padding-bottom: 0.15rem;
+  }

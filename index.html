@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<body>
+
+  <header>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="min-height: 20px;">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse align-items-start" id="navbarNav">
+                <span class="navbar-text name-display">Luis Rivera</span>
+            </div>
+        </div>
+    </nav>
+</header>
+
+  <main>
+    <section id="hero" class="text-center">
+      <div class="container">
+        <h1 class="display-4" style="text-align: left;"></h1>
+        <a class="lead" href="https://github.com/" style="color: rgb(88, 87, 87);" style="font-family: sans-serif;"></a>
+        <div id="carousel-text" style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); color: #fff; font-size: 24px; text-align: center; opacity: 0; transition: opacity 1s;">test</div>
+        <hr>
+      </div>
+    </section>
+
+    <section id="projects" class="container my-5">
+      <h2></h2>
+    <div class="carousel-background"></div>
+      <div id="carouselExampleControls" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <a href="project1.html">
+              <img src="https://i.gyazo.com/e47d43b98f406353472d3456a4efb48f.jpg" class="d-block project-image rounded-img" alt="Project 1">
+            </a>
+          </div>
+          <div class="carousel-item">
+            <a href="project2.html">
+              <img src="https://i.gyazo.com/761361e3daab1d8c47c17de174d6c2a0.png" class="d-block project-image rounded-img" alt="Project 2">
+            </a>
+          </div>
+          <div class="carousel-item">
+            <a href="project3.html">
+              <img src="https://i.gyazo.com/b856e89151b9721d7fc13363b6a71e33.png" class="d-block project-image rounded-img" alt="Project 3">
+            </a>
+          </div>
+        </div>
+        <button class="carousel-control-prev carousel-control-custom" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next carousel-control-custom" type="button" data-bs-target="#carouselExampleControls" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </div>  
+    </section>
+    
+
+    
+  </main>
+
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+  <script src="script.js"></script>
+
+
+  <div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-body">
+          <img id="modalImage" src="" alt="Project Image" class="modal-img">
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+    </div>
+  </div>
+
+  <section id="skills" class="bg-dark py-5">
+    <div class="container">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="card skills-card">
+            <div class="card-logo">
+              <img src="https://imgur.com/OQX85ta.png" alt="Your Logo" class="img-fluid">
+            </div>
+            <div class="card-body">
+              <h3 class="text-designer">Novice</h3>
+              <p>I possess a fundamental understanding or am new to the following topics.</p>
+              <h4 class="text-lightblue">Programs:</h4>
+              <p>AdobeXD, Sketch, Sublime Text, Xcode</p>
+              <h4 class="text-lightblue">Languages:</h4>
+              <p>
+                HTML<br>
+                CSS<br>
+                PHP<br>
+                Swift<br>
+                Go<br>
+                C#
+              </p>
+            </div>
+          </div>
+        </div>
+        <!-- Add additional columns with desired content here -->
+        <div class="col-md-4">
+          <div class="card skills-card">
+            <div class="card-logo">
+              <img src="https://i.imgur.com/IbwfN8J.png" alt="Your Logo" class="img-fluid">
+            </div>
+            <div class="card-body">
+              <h3 class="text-designer">Intermediate</h3>
+              <p>I have a good understanding of these topics, but I prefer working with other languages.</p>
+              <h4 class="text-lightblue">Programs:</h4>
+              <p>MySQL Workbench, MongoDB, NodeJS, ReactJS, jQuery</p>
+              <h4 class="text-lightblue">Languages:</h4>
+              <p>
+                C++<br>
+                Ruby<br>
+                SQL<br>
+                NoSQL<br>
+                Rust<br>
+                
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="card skills-card">
+            <div class="card-logo">
+              <img src="https://i.imgur.com/335wFXZ.png" alt="Your Logo" class="img-fluid">
+            </div>
+            <div class="card-body">
+              <h3 class="text-designer">Proficient</h3>
+              <p>I prefer to use these languages and programs, and I consider myself highly skilled in them.</p>
+              <h4 class="text-lightblue">Programs:</h4>
+              <p>GPT-4, GPT-3.5, Google Cloud, PyCharm, Visual Studio Code, Discord</p>
+              <h4 class="text-lightblue">Languages:</h4>
+              <p>
+                Python<br>
+                Javascript<br>
+                Java<br>
+               
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  
+  <section id="contact" class="container my-5">
+    <hr>
+    <h2>Contact</h2>
+    <form>
+       925-421-8087  
+     - luisoprivera@gmail.com 
+    </form>
+    <hr>
+  </section>
+
+  <footer class="bg-dark text-white text-center py-3">
+    <p>&copy; 2023 Luis Rivera. All Rights Reserved.</p>
+  </footer>
+
+  
+
+</body>
+</html>
