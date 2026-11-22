@@ -1,12 +1,17 @@
 const KEY = "euclids-harness-key";
-const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI"];
 const RANK = { BREAKS: 0, WEAKENS: 1, HOLDS: 2 };
-const MARK = { green: "sound", yellow: "thin", red: "fails" };
+const COLORS = ["red", "blue", "yellow", "green"];
 const KINDS = ["axiom", "step", "conclusion"];
+const CRACKS = `<svg class="cracks" viewBox="0 0 160 100" aria-hidden="true">
+  <path d="M48 0 L62 28 L50 46 L70 100" fill="none" stroke="rgba(0,0,0,0.38)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M108 0 L96 36 L112 58 L100 100" fill="none" stroke="rgba(0,0,0,0.28)" stroke-width="2.4" stroke-linecap="round"/>
+</svg>`;
 
 const claimEl = document.querySelector("#claim");
 const statusEl = document.querySelector("#status");
-const columnsEl = document.querySelector("#columns");
+const towerEl = document.querySelector("#tower");
+const trayEl = document.querySelector("#tray");
+const trayBlocksEl = document.querySelector("#tray-blocks");
 const verdictEl = document.querySelector("#verdict");
 const summaryEl = document.querySelector("#summary");
 const decomposeBtn = document.querySelector("#decompose");
@@ -20,10 +25,6 @@ let columns = [];
 let verdict = null;
 let summary = null;
 let busy = false;
-
-function roman(n) {
-  return ROMAN[n - 1] || String(n);
-}
 
 function claimText() {
   return claimEl.value.trim();
@@ -51,7 +52,15 @@ function slim(col) {
 function clearStress() {
   verdict = null;
   summary = null;
-  for (const col of columns) delete col.status;
+  for (const col of columns) {
+    delete col.status;
+    col.loadBearing = false;
+  }
+}
+
+function shortModel(id) {
+  const match = String(id || "").match(/gemini-4-(\w+)/i);
+  return match ? match[1].toLowerCase() : String(id || "").toLowerCase();
 }
 
 async function post(url, body) {
@@ -108,13 +117,13 @@ function paintChrome() {
   }
   summaryEl.hidden = false;
   const heading = document.createElement("h2");
-  heading.textContent = "Each axiom removed in turn";
+  heading.textContent = "Each block pulled in turn";
   const bearing = summary.results.filter((row) => row.verdict !== "HOLDS");
   const lead = document.createElement("p");
   lead.className = "bearing";
   lead.textContent = bearing.length
     ? "Load-bearing: " + bearing.map((row) => row.title).join(", ")
-    : "No axiom here is load-bearing.";
+    : "No block here is load-bearing.";
   const list = document.createElement("ul");
   for (const row of summary.results) {
     const item = document.createElement("li");
@@ -137,101 +146,95 @@ function paintChrome() {
   }
 }
 
-function button(text, act, label) {
-  const el = document.createElement("button");
-  el.type = "button";
-  el.dataset.act = act;
-  el.className = act;
-  el.textContent = text;
-  el.setAttribute("aria-label", label);
-  if (act === "toggle") el.setAttribute("aria-pressed", String(text === "on"));
-  return el;
+function colorFor(col, index) {
+  if (col.kind === "conclusion") return "orange conclusion";
+  return COLORS[index % COLORS.length];
+}
+
+function makeBlock(col, index, inTray) {
+  const article = document.createElement("article");
+  article.className = ["block", colorFor(col, index), col.loadBearing ? "load-bearing" : ""].filter(Boolean).join(" ");
+  article.dataset.id = col.id;
+  article.dataset.kind = col.kind;
+
+  const kind = document.createElement("p");
+  kind.className = "kind";
+  kind.textContent = col.kind;
+
+  const title = document.createElement("p");
+  title.className = "title";
+  title.textContent = col.title;
+
+  const text = document.createElement("p");
+  text.className = "text";
+  text.textContent = col.text;
+
+  article.insertAdjacentHTML("beforeend", CRACKS);
+  article.append(kind, title, text);
+
+  if (inTray) {
+    const back = document.createElement("button");
+    back.type = "button";
+    back.className = "put-back";
+    back.dataset.act = "put-back";
+    back.textContent = "Put it back";
+    article.append(back);
+  } else if (col.kind !== "conclusion") {
+    article.setAttribute("aria-label", `Pull out ${col.title}`);
+  }
+  return article;
+}
+
+function layer(name, items, offset) {
+  const row = document.createElement("div");
+  row.className = "layer layer-" + name;
+  items.forEach((col, i) => row.append(makeBlock(col, offset + i, false)));
+  return row;
 }
 
 function build() {
   paintChrome();
   sync();
+  const standing = columns.filter((col) => col.enabled !== false);
+  const pulled = columns.filter((col) => col.enabled === false);
+  const axioms = standing.filter((col) => col.kind === "axiom");
+  const steps = standing.filter((col) => col.kind === "step");
+  const conclusions = standing.filter((col) => col.kind === "conclusion");
   const frag = document.createDocumentFragment();
-  columns.forEach((col, index) => {
-    const article = document.createElement("article");
-    article.className = ["column", col.enabled === false ? "off" : "", col.status || ""].filter(Boolean).join(" ");
-    article.dataset.id = col.id;
+  if (conclusions.length) frag.append(layer("conclusion", conclusions, 20));
+  if (steps.length) frag.append(layer("steps", steps, 8));
+  if (axioms.length) frag.append(layer("axioms", axioms, 0));
+  towerEl.replaceChildren(frag);
 
-    const head = document.createElement("div");
-    head.className = "head";
-    const num = document.createElement("span");
-    num.className = "num";
-    num.textContent = roman(index + 1);
-    const kind = button(col.kind, "kind", "Change kind");
-    const controls = document.createElement("span");
-    controls.className = "controls";
-    const on = col.enabled !== false;
-    controls.append(
-      button(on ? "on" : "off", "toggle", on ? "Switch off" : "Switch on"),
-      button("×", "remove", `Remove ${col.title}`),
-    );
-    head.append(num, kind, controls);
+  trayBlocksEl.replaceChildren();
+  trayEl.hidden = pulled.length === 0;
+  pulled.forEach((col, i) => trayBlocksEl.append(makeBlock(col, i, true)));
 
-    const title = document.createElement("input");
-    title.dataset.field = "title";
-    title.className = "title";
-    title.value = col.title;
-    title.setAttribute("aria-label", "Title");
-
-    const text = document.createElement("textarea");
-    text.dataset.field = "text";
-    text.className = "text";
-    text.rows = 4;
-    text.value = col.text;
-    text.setAttribute("aria-label", "Text");
-
-    const earlier = columns.slice(0, index);
-    const from = document.createElement("p");
-    from.className = "from";
-    const label = document.createElement("span");
-    label.textContent = "from";
-    const selected = earlier.filter((prev) => col.dependsOn.includes(prev.id));
-    const names = document.createElement("span");
-    names.className = selected.length ? "deps" : "deps empty";
-    names.textContent = selected.length ? selected.map((prev) => prev.title).join(", ") : "nothing";
-    from.append(label, names);
-
-    const picks = document.createElement("p");
-    picks.className = "picks";
-    earlier.forEach((prev, pick) => {
-      const chip = document.createElement("button");
-      chip.type = "button";
-      chip.dataset.act = "dep";
-      chip.dataset.dep = prev.id;
-      chip.className = col.dependsOn.includes(prev.id) ? "chip on" : "chip";
-      chip.textContent = roman(pick + 1);
-      chip.title = prev.title;
-      chip.setAttribute("aria-label", `Depends on ${prev.title}`);
-      chip.setAttribute("aria-pressed", String(col.dependsOn.includes(prev.id)));
-      picks.append(chip);
-    });
-
-    article.append(head, title, text, from);
-    if (earlier.length) article.append(picks);
-    if (col.status && col.enabled !== false) {
-      const mark = document.createElement("p");
-      mark.className = "mark";
-      mark.textContent = MARK[col.status] || "";
-      article.append(mark);
-    }
-    frag.append(article);
-  });
-  columnsEl.replaceChildren(frag);
+  if (verdict) applyMotion(verdict.verdict);
+  towerEl.querySelectorAll(".block").forEach((el) => bindPull(el));
 }
 
-function markEdited() {
-  if (!verdict && !summary && columns.every((col) => !col.status)) return;
-  clearStress();
-  paintChrome();
-  for (const el of columnsEl.querySelectorAll(".column")) {
-    el.classList.remove("green", "yellow", "red");
-    el.querySelector(".mark")?.remove();
+function applyMotion(result) {
+  const standing = [...towerEl.querySelectorAll(".block")];
+  if (result === "HOLDS") {
+    towerEl.classList.add("steady");
+    return;
   }
+  standing.forEach((el, i) => {
+    const col = columns.find((item) => item.id === el.dataset.id);
+    const status = col?.status;
+    if (result === "WEAKENS" && (status === "yellow" || status === "red" || col?.kind === "conclusion")) {
+      el.classList.add("wobble", "cracked");
+      el.style.animationDelay = `${i * 40}ms`;
+    }
+    if (result === "BREAKS" && (status === "red" || col?.kind === "conclusion")) {
+      const dir = i % 2 === 0 ? 1 : -1;
+      el.style.setProperty("--dx", `${dir * (70 + (i % 3) * 24)}px`);
+      el.style.setProperty("--rot", `${dir * (22 + (i % 4) * 8)}deg`);
+      el.style.animationDelay = `${80 + i * 70}ms`;
+      el.classList.add("tumble");
+    }
+  });
 }
 
 function requireClaim() {
@@ -245,7 +248,7 @@ function requireClaim() {
 async function decompose() {
   const claim = requireClaim();
   if (!claim) return;
-  await withBusy("Reading the claim…", async () => {
+  await withBusy("Building the tower…", async () => {
     const data = await post("/api/decompose", { claim });
     columns = data.columns.map((col) => ({ ...col, dependsOn: [...col.dependsOn], enabled: true }));
     clearStress();
@@ -260,6 +263,7 @@ function applyStress(data) {
   for (const col of columns) {
     if (col.enabled === false) delete col.status;
     else col.status = status.get(col.id) || "green";
+    col.loadBearing = false;
   }
   verdict = { verdict: data.verdict, explanation: data.explanation, source: data.source };
   noteSource(data.source);
@@ -269,7 +273,7 @@ async function stress(removed, label) {
   const claim = requireClaim();
   if (!claim) return false;
   const removedIds = new Set(removed.map((col) => col.id));
-  const kept = columns.filter((col) => !removedIds.has(col.id));
+  const kept = columns.filter((col) => !removedIds.has(col.id) && col.enabled !== false);
   if (!kept.length) {
     clearStress();
     setStatus("Nothing left to test.");
@@ -288,71 +292,50 @@ async function stress(removed, label) {
   return ok;
 }
 
-async function removeColumn(id) {
-  const target = columns.find((col) => col.id === id);
-  if (!target || busy) return;
-  const removed = columns.filter((col) => col.id === id || col.enabled === false);
-  const kept = columns.filter((col) => !removed.some((item) => item.id === col.id));
+async function pullBlock(id) {
+  const col = columns.find((item) => item.id === id);
+  if (!col || busy || col.enabled === false || col.kind === "conclusion") return;
+  col.enabled = false;
+  clearStress();
+  build();
+  const removed = columns.filter((item) => item.enabled === false);
+  const kept = columns.filter((item) => item.enabled !== false);
   if (!kept.length) {
-    columns = columns.filter((col) => col.id !== id);
-    for (const col of columns) col.dependsOn = col.dependsOn.filter((dep) => dep !== id);
+    setStatus("Nothing left to test.");
+    return;
+  }
+  const ok = await stress(removed, `Pulling out ${col.title}…`);
+  if (!ok) col.enabled = true;
+  build();
+  if (ok) verdictEl.scrollIntoView({ block: "nearest" });
+}
+
+async function putBack(id) {
+  const col = columns.find((item) => item.id === id);
+  if (!col || busy || col.enabled !== false) return;
+  col.enabled = true;
+  const removed = columns.filter((item) => item.enabled === false);
+  const kept = columns.filter((item) => item.enabled !== false);
+  if (!removed.length) {
+    clearStress();
+    build();
+    return;
+  }
+  if (!kept.length) {
     clearStress();
     build();
     setStatus("Nothing left to test.");
     return;
   }
-  const ok = await stress(removed, `Stress-testing without ${target.title}…`);
-  if (!ok) return;
-  columns = columns.filter((col) => col.id !== id);
-  for (const col of columns) col.dependsOn = col.dependsOn.filter((dep) => dep !== id);
-  build();
-  verdictEl.scrollIntoView({ block: "nearest" });
-}
-
-async function toggleColumn(id) {
-  const col = columns.find((item) => item.id === id);
-  if (!col || busy) return;
-  col.enabled = col.enabled === false;
-  clearStress();
-  const removed = columns.filter((item) => item.enabled === false);
-  const kept = columns.filter((item) => item.enabled !== false);
-  build();
-  if (!kept.length) {
-    setStatus("Nothing left to test.");
-    return;
-  }
-  if (!removed.length) return;
-  const ok = await stress(removed, `Stress-testing without ${removed.map((item) => item.title).join(", ")}…`);
-  if (!ok) col.enabled = col.enabled === false;
-  build();
-  if (ok) verdictEl.scrollIntoView({ block: "nearest" });
-}
-
-function cycleKind(id) {
-  const col = columns.find((item) => item.id === id);
-  if (!col || busy) return;
-  col.kind = KINDS[(KINDS.indexOf(col.kind) + 1) % KINDS.length];
-  clearStress();
-  build();
-}
-
-function toggleDep(id, dep) {
-  const index = columns.findIndex((col) => col.id === id);
-  const col = columns[index];
-  if (!col || busy || index < 0) return;
-  const earlier = columns.slice(0, index).map((item) => item.id);
-  const next = new Set(col.dependsOn);
-  if (next.has(dep)) next.delete(dep);
-  else next.add(dep);
-  col.dependsOn = earlier.filter((item) => next.has(item));
-  clearStress();
+  const ok = await stress(removed, `Putting ${col.title} back…`);
+  if (!ok) col.enabled = false;
   build();
 }
 
 function addColumn() {
   if (busy) return;
   const id = "u" + Math.random().toString(36).slice(2, 7);
-  const kind = columns.length ? "step" : "axiom";
+  const kind = columns.some((col) => col.kind === "axiom") ? "step" : "axiom";
   const col = {
     id,
     kind,
@@ -366,7 +349,32 @@ function addColumn() {
   else columns.splice(at, 0, col);
   clearStress();
   build();
-  columnsEl.querySelector(`[data-id="${id}"] [data-field="title"]`)?.focus();
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function playStressAll(results) {
+  for (const row of results) {
+    const el = towerEl.querySelector(`.block[data-id="${row.id}"]`);
+    if (!el) continue;
+    el.classList.add("pulling", "flash-" + row.verdict);
+    if (row.verdict === "WEAKENS") el.classList.add("wobble", "cracked");
+    if (row.verdict === "BREAKS") {
+      el.style.setProperty("--dx", "86px");
+      el.style.setProperty("--rot", "16deg");
+    }
+    await sleep(row.verdict === "HOLDS" ? 520 : 780);
+    el.classList.remove("pulling", "wobble", "cracked", "flash-HOLDS", "flash-WEAKENS", "flash-BREAKS");
+    el.style.removeProperty("--dx");
+    el.style.removeProperty("--rot");
+    await sleep(160);
+  }
+  for (const row of results) {
+    const col = columns.find((item) => item.id === row.id);
+    if (col) col.loadBearing = row.verdict !== "HOLDS";
+  }
 }
 
 async function stressAll() {
@@ -374,7 +382,7 @@ async function stressAll() {
   if (!claim || busy) return;
   const kept = columns.filter((col) => col.enabled !== false);
   const order = new Map(kept.map((col, index) => [col.id, index]));
-  await withBusy("Removing each axiom in turn…", async () => {
+  await withBusy("Pulling each block in turn…", async () => {
     const data = await post("/api/stress-all", { claim, columns: kept.map(slim) });
     clearStress();
     summary = {
@@ -384,9 +392,54 @@ async function stressAll() {
       ),
     };
     noteSource(data.source);
+    build();
+    await playStressAll(summary.results);
+    build();
   });
-  build();
   if (summary) summaryEl.scrollIntoView({ block: "nearest" });
+}
+
+function bindPull(el) {
+  const id = el.dataset.id;
+  if (!id || el.dataset.kind === "conclusion") return;
+  let startX = 0;
+  let startY = 0;
+  let dragged = false;
+  let holding = false;
+
+  el.addEventListener("pointerdown", (event) => {
+    if (event.button !== 0 || busy || event.target.closest("button")) return;
+    holding = true;
+    dragged = false;
+    startX = event.clientX;
+    startY = event.clientY;
+    el.setPointerCapture(event.pointerId);
+  });
+
+  el.addEventListener("pointermove", (event) => {
+    if (!holding) return;
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    if (Math.hypot(dx, dy) > 8) dragged = true;
+    if (dragged) el.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 18}deg)`;
+  });
+
+  const finish = (event) => {
+    if (!holding) return;
+    holding = false;
+    try { el.releasePointerCapture(event.pointerId); } catch {}
+    const dx = event.clientX - startX;
+    const dy = event.clientY - startY;
+    el.style.transform = "";
+    if (Math.abs(dx) > 56 || Math.hypot(dx, dy) > 80) pullBlock(id);
+    else if (!dragged) pullBlock(id);
+  };
+
+  el.addEventListener("pointerup", finish);
+  el.addEventListener("pointercancel", () => {
+    holding = false;
+    el.style.transform = "";
+  });
 }
 
 document.querySelector("#composer").addEventListener("submit", (event) => {
@@ -404,25 +457,11 @@ claimEl.addEventListener("keydown", (event) => {
 stressAllBtn.addEventListener("click", stressAll);
 addBtn.addEventListener("click", addColumn);
 
-columnsEl.addEventListener("input", (event) => {
-  const article = event.target.closest(".column");
-  const col = columns.find((item) => item.id === article?.dataset.id);
-  const field = event.target.dataset.field;
-  if (!col || !field) return;
-  col[field] = event.target.value;
-  markEdited();
-});
-
-columnsEl.addEventListener("click", (event) => {
-  const control = event.target.closest("button");
-  const article = event.target.closest(".column");
-  if (!control || !article) return;
-  const id = article.dataset.id;
-  const act = control.dataset.act;
-  if (act === "remove") removeColumn(id);
-  else if (act === "toggle") toggleColumn(id);
-  else if (act === "kind") cycleKind(id);
-  else if (act === "dep") toggleDep(id, control.dataset.dep);
+trayEl.addEventListener("click", (event) => {
+  const btn = event.target.closest("[data-act='put-back']");
+  const block = event.target.closest(".block");
+  if (!btn || !block) return;
+  putBack(block.dataset.id);
 });
 
 keyEl.value = localStorage.getItem(KEY) || "";
@@ -442,10 +481,10 @@ forgetBtn.addEventListener("click", () => {
 fetch("/api/health")
   .then((res) => res.json())
   .then((data) => {
-    const level = String(data.thinking || "").toLowerCase();
-    footEl.textContent = data.configured
-      ? `${data.model} · thinking ${level} · server key in use`
-      : `${data.model} · thinking ${level} · no server key`;
+    const main = `${shortModel(data.model)} · ${String(data.thinking || "").toLowerCase()}`;
+    const stress = `${shortModel(data.stressModel)} · ${String(data.stressThinking || "").toLowerCase()}`;
+    const mode = data.configured ? "server key in use" : "no server key";
+    footEl.textContent = `main: ${main}  |  stress: ${stress}  ·  ${mode}`;
   })
   .catch(() => {});
 

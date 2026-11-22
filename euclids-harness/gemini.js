@@ -1,6 +1,7 @@
 import { GoogleGenAI, Type } from "@google/genai";
 import { GEMINI_MODEL, THINKING_LEVEL } from "./constants.js";
 
+
 const columnSchema = {
   type: Type.OBJECT,
   properties: {
@@ -70,14 +71,14 @@ function parseJson(text) {
   }
 }
 
-export async function generateJson({ apiKey, prompt, schema }) {
+export async function generateJson({ apiKey, prompt, schema, model = GEMINI_MODEL, thinkingLevel = THINKING_LEVEL }) {
   const ai = new GoogleGenAI({ apiKey });
   const response = await ai.models.generateContent({
-    model: GEMINI_MODEL,
+    model,
     contents: prompt,
     config: {
       abortSignal: AbortSignal.timeout(90_000),
-      thinkingConfig: { thinkingLevel: THINKING_LEVEL, includeThoughts: false },
+      thinkingConfig: { thinkingLevel, includeThoughts: false },
       responseMimeType: "application/json",
       responseSchema: schema,
     },

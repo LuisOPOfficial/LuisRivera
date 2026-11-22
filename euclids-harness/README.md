@@ -15,7 +15,7 @@ npm run dev
 
 Open http://localhost:4173
 
-The model is `gemini-4-neon` with thinking level `HIGH`. Both are constants in `constants.js`.
+Decompose (the main run) uses `gemini-4-neon` at thinking level `HIGH`. Single-block pulls and stress-test-all use `gemini-4-carbon` at thinking level `MEDIUM`. All four values live in `constants.js`.
 
 ### A Gemini key
 

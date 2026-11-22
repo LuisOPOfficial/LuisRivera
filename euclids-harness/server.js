@@ -2,7 +2,7 @@ import express from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { GEMINI_MODEL, THINKING_LEVEL } from "./constants.js";
+import { GEMINI_MODEL, STRESS_MODEL, STRESS_THINKING_LEVEL, THINKING_LEVEL } from "./constants.js";
 import { generateJson, schemas } from "./gemini.js";
 import { judge, judgeAll, loadChain, mockDecompose, normalizeColumns, oneLine } from "./shared/logic.js";
 
@@ -148,6 +148,8 @@ export function createApp() {
       ok: true,
       model: GEMINI_MODEL,
       thinking: THINKING_LEVEL,
+      stressModel: STRESS_MODEL,
+      stressThinking: STRESS_THINKING_LEVEL,
       configured: Boolean(process.env.GEMINI_API_KEY?.trim()),
     });
   });
@@ -160,10 +162,16 @@ export function createApp() {
         res.json({ source: "mock", columns: mockDecompose(claim) });
         return;
       }
-      const raw = await generateJson({ apiKey: key, prompt: decomposePrompt(claim), schema: schemas.decompose });
+      const raw = await generateJson({
+        apiKey: key,
+        prompt: decomposePrompt(claim),
+        schema: schemas.decompose,
+        model: GEMINI_MODEL,
+        thinkingLevel: THINKING_LEVEL,
+      });
       const columns = normalizeColumns(raw.columns);
       if (!columns.length) throw new Error("The model returned no columns.");
-      res.json({ source: "gemini", columns });
+      res.json({ source: "gemini", model: GEMINI_MODEL, thinking: THINKING_LEVEL, columns });
     } catch (err) {
       fail(res, err, key);
     }
@@ -185,8 +193,15 @@ export function createApp() {
         apiKey: key,
         prompt: stressPrompt(claim, columns, removedIds),
         schema: schemas.stress,
+        model: STRESS_MODEL,
+        thinkingLevel: STRESS_THINKING_LEVEL,
       });
-      res.json({ source: "gemini", ...normalizeVerdict(raw, remaining) });
+      res.json({
+        source: "gemini",
+        model: STRESS_MODEL,
+        thinking: STRESS_THINKING_LEVEL,
+        ...normalizeVerdict(raw, remaining),
+      });
     } catch (err) {
       fail(res, err, key);
     }
@@ -207,8 +222,15 @@ export function createApp() {
         apiKey: key,
         prompt: stressAllPrompt(claim, columns),
         schema: schemas.stressAll,
+        model: STRESS_MODEL,
+        thinkingLevel: STRESS_THINKING_LEVEL,
       });
-      res.json({ source: "gemini", results: normalizeAll(raw, axioms) });
+      res.json({
+        source: "gemini",
+        model: STRESS_MODEL,
+        thinking: STRESS_THINKING_LEVEL,
+        results: normalizeAll(raw, axioms),
+      });
     } catch (err) {
       fail(res, err, key);
     }
@@ -234,8 +256,9 @@ async function main() {
     app.use(vite.middlewares);
   }
   const port = Number(process.env.PORT) || 4173;
-  app.listen(port, () => {
-    console.log(`Euclid's Harness at http://localhost:${port}`);
+  const host = process.env.HOST || "127.0.0.1";
+  app.listen(port, host, () => {
+    console.log(`Euclid's Harness at http://${host}:${port}`);
   });
 }
 

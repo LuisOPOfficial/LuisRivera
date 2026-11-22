@@ -1,11 +1,13 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { GEMINI_MODEL, THINKING_LEVEL } from "../constants.js";
+import { GEMINI_MODEL, STRESS_MODEL, STRESS_THINKING_LEVEL, THINKING_LEVEL } from "../constants.js";
 import { judge, judgeAll, loadChain, mockDecompose, normalizeColumns } from "../shared/logic.js";
 
-test("model constants stay on gemini-4-neon at high", () => {
+test("model constants stay on neon high for main and carbon medium for stress", () => {
   assert.equal(GEMINI_MODEL, "gemini-4-neon");
   assert.equal(THINKING_LEVEL, "HIGH");
+  assert.equal(STRESS_MODEL, "gemini-4-carbon");
+  assert.equal(STRESS_THINKING_LEVEL, "MEDIUM");
 });
 
 test("normalize keeps earlier deps and repairs a chain", () => {

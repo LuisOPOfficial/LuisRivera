@@ -28,6 +28,8 @@ test("decompose, stress, and stress-all run without a key", async () => {
     const health = await fetch(`http://127.0.0.1:${port}/api/health`).then((res) => res.json());
     assert.equal(health.model, "gemini-4-neon");
     assert.equal(health.thinking, "HIGH");
+    assert.equal(health.stressModel, "gemini-4-carbon");
+    assert.equal(health.stressThinking, "MEDIUM");
     assert.equal(health.configured, false);
     assert.equal(JSON.stringify(health).includes("AIza"), false);
 
