@@ -1,0 +1,312 @@
+:root {
+  --bg: #f4f3ef;
+  --ink: #1a1916;
+  --muted: #6f6b64;
+  --faint: #b7b2a8;
+  --line: #e0dcd4;
+  --green: #1d6a40;
+  --yellow: #8a6410;
+  --red: #8d302b;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+
+body {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, serif;
+  min-height: 100vh;
+  padding: 4.5rem 2.5rem 6rem;
+}
+
+::selection { background: #e3dfd4; }
+
+:focus-visible { outline: 1px solid var(--ink); outline-offset: 3px; }
+
+h1 {
+  margin: 0;
+  font-weight: 500;
+  font-size: 3.15rem;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.lede {
+  max-width: 34rem;
+  margin: 0.85rem 0 3.25rem;
+  color: #3c3a36;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-family: system-ui, sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+#claim {
+  display: block;
+  width: min(40rem, 100%);
+  min-height: 3.2rem;
+  padding: 0.2rem 0 0.55rem;
+  border: none;
+  border-bottom: 1px solid var(--ink);
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 1.45rem;
+  line-height: 1.35;
+  resize: vertical;
+}
+
+#claim::placeholder { color: var(--faint); }
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem 0.75rem;
+  margin-top: 1.15rem;
+}
+
+button {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.03em;
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--ink);
+  padding: 0.5rem 0.85rem;
+  cursor: pointer;
+}
+
+button.primary { background: var(--ink); color: var(--bg); }
+
+button.ghost:hover { background: rgba(22, 21, 19, 0.04); }
+
+button:disabled { opacity: 0.35; cursor: default; }
+
+button:disabled:hover { background: transparent; }
+
+button.primary:disabled:hover { background: var(--ink); }
+
+#status {
+  font-family: system-ui, sans-serif;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+#status.bad { color: var(--red); }
+
+.verdict { max-width: 40rem; margin-top: 2.75rem; }
+
+.verdict b {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+  font-size: 1.7rem;
+  letter-spacing: 0.16em;
+}
+
+.verdict p { margin: 0; font-size: 1.05rem; line-height: 1.45; }
+
+.v-HOLDS, .column.green .mark { color: var(--green); }
+.v-WEAKENS, .column.yellow .mark { color: var(--yellow); }
+.v-BREAKS, .column.red .mark { color: var(--red); }
+
+.columns {
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  margin-top: 2.75rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.column {
+  flex: 1 0 9.75rem;
+  max-width: 16rem;
+  min-height: 18rem;
+  padding: 0 1rem 0.5rem;
+  border-left: 2px solid var(--line);
+}
+
+.column.green { border-left-color: var(--green); }
+.column.yellow { border-left-color: var(--yellow); }
+.column.red { border-left-color: var(--red); }
+.column.off { opacity: 0.38; }
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.num, .kind, .mark {
+  font-family: system-ui, sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.kind {
+  border: none;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.controls { margin-left: auto; display: flex; align-items: baseline; }
+
+.controls button {
+  border: none;
+  padding: 0 0 0 0.65rem;
+  background: none;
+  color: var(--muted);
+  letter-spacing: 0;
+}
+
+.controls .remove { font-size: 1rem; line-height: 1; }
+
+.column .title, .column .text {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  border: none;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font-family: Georgia, "Iowan Old Style", Palatino, serif;
+  resize: none;
+}
+
+.column .title { margin: 0.85rem 0 0.4rem; font-size: 1.12rem; }
+
+.column .text { font-size: 0.95rem; line-height: 1.35; }
+
+.from {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.45rem;
+  align-items: baseline;
+  margin: 0.9rem 0 0;
+}
+
+.mark { margin: 0.85rem 0 0; }
+
+.from > span:first-child {
+  font-family: system-ui, sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.deps { font-size: 0.84rem; line-height: 1.3; }
+
+.deps.empty { color: var(--faint); }
+
+.picks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem 0.45rem;
+  margin: 0.4rem 0 0;
+}
+
+.chip {
+  border: none;
+  padding: 0;
+  background: none;
+  color: var(--faint);
+  font-family: system-ui, sans-serif;
+  font-size: 0.66rem;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.chip.on { color: var(--ink); }
+
+.summary { max-width: 46rem; margin-top: 3.5rem; }
+
+.summary h2, .summary .via, footer, #foot {
+  font-family: system-ui, sans-serif;
+}
+
+.summary h2 {
+  margin: 0;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.bearing { margin: 0.45rem 0 1.1rem; font-size: 1.25rem; line-height: 1.35; }
+
+.summary ul { list-style: none; margin: 0; padding: 0; }
+
+.summary li {
+  display: grid;
+  grid-template-columns: 11rem 6.5rem 1fr;
+  gap: 0.5rem 0.75rem;
+  align-items: baseline;
+  padding: 0.6rem 0;
+  border-top: 1px solid var(--line);
+  font-size: 0.95rem;
+}
+
+.summary .v-HOLDS,
+.summary .v-WEAKENS,
+.summary .v-BREAKS {
+  font-family: system-ui, sans-serif;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.summary .via { margin: 0.9rem 0 0; font-size: 0.75rem; color: var(--muted); }
+
+footer {
+  margin-top: 4.5rem;
+  padding-top: 1.15rem;
+  border-top: 1px solid var(--line);
+}
+
+.keyline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1rem; }
+
+.keyline label { margin: 0; }
+
+#key {
+  width: min(18rem, 100%);
+  border: none;
+  border-bottom: 1px solid var(--line);
+  padding: 0.2rem 0;
+  background: transparent;
+  color: inherit;
+  font-family: system-ui, sans-serif;
+  font-size: 0.85rem;
+}
+
+button.quiet {
+  border: none;
+  padding: 0;
+  background: none;
+  color: var(--muted);
+}
+
+#foot { margin: 0.75rem 0 0; font-size: 0.75rem; color: var(--muted); }
+
+[hidden] { display: none !important; }
+
+@media (max-width: 720px) {
+  body { padding: 2rem 1.15rem 4rem; }
+  h1 { font-size: 2.2rem; }
+  .summary li { grid-template-columns: 1fr; gap: 0.15rem; }
+  .column { flex-basis: 12rem; }
+}

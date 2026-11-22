@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Euclid's Harness</title>
+  <link rel="stylesheet" href="/src/style.css" />
+</head>
+<body>
+  <main id="app">
+    <header>
+      <h1>Euclid's Harness</h1>
+      <p class="lede">Enter a claim. It is taken apart into the axioms, steps, and conclusion it stands on. Remove one, and see whether the rest still holds.</p>
+    </header>
+
+    <form id="composer">
+      <label for="claim">Claim</label>
+      <textarea id="claim" rows="2" placeholder="The sun will rise tomorrow."></textarea>
+      <div class="actions">
+        <button type="submit" id="decompose" class="primary">Decompose</button>
+        <button type="button" id="stress-all" class="ghost" disabled>Stress test all</button>
+        <button type="button" id="add" class="ghost">Add a column</button>
+        <span id="status" role="status"></span>
+      </div>
+    </form>
+
+    <section id="verdict" class="verdict" hidden></section>
+    <div id="columns" class="columns"></div>
+    <section id="summary" class="summary" hidden></section>
+
+    <footer>
+      <div class="keyline">
+        <label for="key">Gemini key</label>
+        <input id="key" type="password" name="euclid-gemini-key" autocomplete="off" spellcheck="false" placeholder="Paste a key if the server has none" />
+        <button type="button" id="forget" class="quiet" hidden>Forget</button>
+      </div>
+      <p id="foot"></p>
+    </footer>
+  </main>
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
